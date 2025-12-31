@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "{{ description }}"
 readme = "README.md"
 authors = [
-    { name = "{{ author_full }}", email = "{{ author_email }}" }
+    { name = "{{ author_name }}", email = "{{ author_email }}" }
 ]
 requires-python = ">=3.13"
 dependencies = [
