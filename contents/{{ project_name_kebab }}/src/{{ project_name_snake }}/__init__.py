@@ -1,2 +1,2 @@
 def main() -> None:
-    print("Hello from {{ project-name }}!")
+    print("Hello from {{ project_name_kebab }}!")

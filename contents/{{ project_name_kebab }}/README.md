@@ -1,5 +1,3 @@
-# {{ project-name }}
+# {{ project_name_kebab }}
 
-Author: {{ author_full }}
-
-{{ greeting }}
+{{ description }}

@@ -1,5 +1,5 @@
 [project]
-name = "{{ project-name }}"
+name = "{{ project_name_kebab }}"
 version = "0.1.0"
 description = "{{ description }}"
 readme = "README.md"
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-{{ project-name }} = "{{ project_name }}:main"
+{{ project_name_kebab }} = "{{ project_name_snake }}:main"
 
 [build-system]
 requires = ["uv_build>=0.9.17,<0.10.0"]

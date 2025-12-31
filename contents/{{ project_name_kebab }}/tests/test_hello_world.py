@@ -1,4 +1,4 @@
-import {{ project_name }}
+import {{ project_name_snake }}
 
 def test_hello_world():
-    {{ project_name }}.main()
+    {{ project_name_snake }}.main()

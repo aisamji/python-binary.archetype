@@ -72,17 +72,17 @@ jobs:
         if: steps.pycache.outputs.cache-hit != 'true'
         run: uv sync --locked --no-dev
       - name: Run PyInstaller
-        run: uv run pyinstaller .venv/bin/{{ project-name }}
+        run: uv run pyinstaller .venv/bin/{{ project_name_kebab }}
       - name: Rename binary (*nix)
         if: ${{ "{{ runner.os != 'Windows' }}" }}
-        run: mv dist/{{ project-name }}/{{ project-name }}${{ "{{ matrix.extension }}" }} dist/{{ project-name }}/{{ project-name }}-${{ "{{ needs.metadata.outputs.version }}" }}-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}${{ "{{ matrix.extension }}" }}
+        run: mv dist/{{ project_name_kebab }}/{{ project_name_kebab }}${{ "{{ matrix.extension }}" }} dist/{{ project_name_kebab }}/{{ project_name_kebab }}-${{ "{{ needs.metadata.outputs.version }}" }}-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}${{ "{{ matrix.extension }}" }}
       - name: Rename binary (Windows)
         if: ${{ "{{ runner.os == 'Windows' }}" }}
-        run: Rename-Item -Path dist/{{ project-name }}/{{ project-name }}${{ "{{ matrix.extension }}" }} -NewName {{ project-name }}-${{ "{{ needs.metadata.outputs.version }}" }}-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}${{ "{{ matrix.extension }}" }}
+        run: Rename-Item -Path dist/{{ project_name_kebab }}/{{ project_name_kebab }}${{ "{{ matrix.extension }}" }} -NewName {{ project_name_kebab }}-${{ "{{ needs.metadata.outputs.version }}" }}-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}${{ "{{ matrix.extension }}" }}
       - name: Export Binary
         uses: actions/upload-artifact@v6
         with:
-          path: dist/{{ project-name }}/*
+          path: dist/{{ project_name_kebab }}/*
 
   upload-binaries:
     needs:
@@ -97,7 +97,7 @@ jobs:
       - name: Download Binaries
         uses: actions/download-artifact@v6
         with:
-          path: dist/{{ project-name }}
+          path: dist/{{ project_name_kebab }}
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
@@ -105,7 +105,7 @@ jobs:
           omitNameDuringUpdates: true
           tag: ${{ "{{ needs.release-please.outputs.tag_name }}" }}
           omitBodyDuringUpdate: true
-          artifacts: dist/{{ project-name }}/{{ project-name }}*
+          artifacts: dist/{{ project_name_kebab }}/{{ project_name_kebab }}*
           artifactErrorsFailBuild: true
           replacesArtifacts: true
 
