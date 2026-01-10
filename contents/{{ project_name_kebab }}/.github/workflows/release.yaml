@@ -24,8 +24,6 @@ jobs:
       release_created: ${{ "{{ steps.main.outputs.release_created }}" }}
 
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
       - name: release-please-action
         id: main
         uses: googleapis/release-please-action@v4
@@ -56,7 +54,7 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Pipx Install Action
+      - name: Install uv
         uses: threeal/pipx-install-action@v1
         with:
           packages: uv
@@ -70,19 +68,27 @@ jobs:
           path: .venv
       - name: Install dependencies into VirtualEnv
         if: steps.pycache.outputs.cache-hit != 'true'
-        run: uv sync --locked --no-dev
-      - name: Run PyInstaller
-        run: uv run pyinstaller .venv/bin/{{ project_name_kebab }}
-      - name: Rename binary (*nix)
+        run: uv sync --frozen --no-dev
+
+      - name: Build Binary
+        run: uv run pyinstaller --onefile --windowed launcher.py
+      - name: Archive Binary (*nix)
         if: ${{ "{{ runner.os != 'Windows' }}" }}
-        run: mv dist/{{ project_name_kebab }}/{{ project_name_kebab }}${{ "{{ matrix.extension }}" }} dist/{{ project_name_kebab }}/{{ project_name_kebab }}-${{ "{{ needs.metadata.outputs.version }}" }}-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}${{ "{{ matrix.extension }}" }}
-      - name: Rename binary (Windows)
+        working-directory: dist
+        run: |
+          mv launcher${{ "{{ matrix.extension }}" }} {{ project_name_kebab }}${{ "{{ matrix.extension }}" }}
+          zip -r {{ project_name_kebab }}-${{ "{{ needs.release-please.outputs.version }}" }}-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}.zip {{ project_name_kebab }}${{ "{{ matrix.extension }}" }}
+      - name: Archive binary (Windows)
+        working-directory: dist
         if: ${{ "{{ runner.os == 'Windows' }}" }}
-        run: Rename-Item -Path dist/{{ project_name_kebab }}/{{ project_name_kebab }}${{ "{{ matrix.extension }}" }} -NewName {{ project_name_kebab }}-${{ "{{ needs.metadata.outputs.version }}" }}-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}${{ "{{ matrix.extension }}" }}
+        run: |
+          Rename-Item -Path launcher${{ "{{ matrix.extension }}" }} -NewName {{ project_name_kebab }}${{ "{{ matrix.extension }}" }}
+          Compress-Archive -Path {{ project_name_kebab }}${{ "{{ matrix.extension }}" }} -DestinationPath {{ project_name_kebab }}-${{ "{{ needs.release-please.outputs.version }}" }}-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}.zip
       - name: Export Binary
         uses: actions/upload-artifact@v6
         with:
-          path: dist/{{ project_name_kebab }}/*
+          path: dist/{{ project_name_kebab }}-*
+          name: binary-${{ "{{ runner.os }}" }}-${{ "{{ runner.arch }}" }}
 
   upload-binaries:
     needs:
@@ -90,14 +96,15 @@ jobs:
       - build-binaries
 
     if: ${{ "{{ needs.release-please.outputs.release_created == 'true' }}" }}
-    
+
     runs-on: ubuntu-latest
 
     steps:
       - name: Download Binaries
         uses: actions/download-artifact@v6
         with:
-          path: dist/{{ project_name_kebab }}
+          path: dist
+          merge-multiple: true
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
@@ -105,7 +112,6 @@ jobs:
           omitNameDuringUpdates: true
           tag: ${{ "{{ needs.release-please.outputs.tag_name }}" }}
           omitBodyDuringUpdate: true
-          artifacts: dist/{{ project_name_kebab }}/{{ project_name_kebab }}*
+          artifacts: dist/*
           artifactErrorsFailBuild: true
           replacesArtifacts: true
-

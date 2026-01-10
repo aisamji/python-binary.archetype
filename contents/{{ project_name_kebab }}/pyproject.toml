@@ -1,15 +1,11 @@
 [project]
 name = "{{ project_name_kebab }}"
-version = "0.1.0"
+version = "0.0.0"
 description = "{{ description }}"
 readme = "README.md"
-authors = [
-    { name = "{{ author_name }}", email = "{{ author_email }}" }
-]
+authors = [{ name = "{{ author_name }}", email = "{{ author_email }}" }]
 requires-python = ">=3.13"
-dependencies = [
-    "pyinstaller>=6.17.0",
-]
+dependencies = ["pyinstaller>=6.17.0"]
 
 [project.scripts]
 {{ project_name_kebab }} = "{{ project_name_snake }}:main"
@@ -19,7 +15,4 @@ requires = ["uv_build>=0.9.17,<0.10.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = [
-    "pytest>=9.0.2",
-]
-
+dev = ["pytest>=9.0.2"]

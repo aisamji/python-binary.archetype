@@ -1,3 +1,6 @@
+default_stages:
+  - pre-commit
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -13,7 +16,7 @@ repos:
       - id: ruff-check
       - id: ruff-format
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: '0.9.18'
+    rev: "0.9.18"
     hooks:
-      - id: uv-sync  # This is actually a post-checkout hook rather a pre-commit as the name implies
+      - id: uv-sync # This is actually a post-checkout hook rather a pre-commit as the name implies
       - id: uv-lock
